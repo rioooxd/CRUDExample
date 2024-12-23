@@ -6,10 +6,15 @@ using Entities;
 using RepositoryContracts;
 using Repositories;
 using Serilog;
+using CRUDExample.Filters.ActionFilters;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllersWithViews();
+builder.Services.AddControllersWithViews(options => {
+    //options.Filters.Add<ResponseHeaderActionFilter>();
+    var logger = builder.Services.BuildServiceProvider().GetRequiredService<ILogger<ResponseHeaderActionFilter>>();
+    options.Filters.Add(new ResponseHeaderActionFilter(logger, "MyKeyGlobal", "MyValueGlobal", 2));
+});
 
 builder.Host.UseSerilog((HostBuilderContext context, IServiceProvider services, LoggerConfiguration loggerConfiguration) => {
     loggerConfiguration
