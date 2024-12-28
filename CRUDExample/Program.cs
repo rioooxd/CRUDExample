@@ -7,13 +7,13 @@ using RepositoryContracts;
 using Repositories;
 using Serilog;
 using CRUDExample.Filters.ActionFilters;
+using CRUDExample.Filters.ResultFilters;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllersWithViews(options => {
     //options.Filters.Add<ResponseHeaderActionFilter>();
-    var logger = builder.Services.BuildServiceProvider().GetRequiredService<ILogger<ResponseHeaderActionFilter>>();
-    options.Filters.Add(new ResponseHeaderActionFilter(logger, "MyKeyGlobal", "MyValueGlobal", 2));
+    options.Filters.Add(new ResponseHeaderActionFilter("MyKeyGlobal", "MyValueGlobal", 2));
 });
 
 builder.Host.UseSerilog((HostBuilderContext context, IServiceProvider services, LoggerConfiguration loggerConfiguration) => {
@@ -25,7 +25,6 @@ builder.Host.UseSerilog((HostBuilderContext context, IServiceProvider services, 
 });
 builder.Services.AddScoped<ICountriesRepository, CountriesRepository>();
 builder.Services.AddScoped<IPersonsRepository, PersonsRepository>();
-
 builder.Services.AddScoped<ICountriesService, CountriesService>();
 builder.Services.AddScoped<IPersonsService, PersonsService>();
 
@@ -34,6 +33,9 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("Default"));
     options.EnableSensitiveDataLogging();
 });
+
+builder.Services.AddTransient<PersonsListResultFilter>();
+
 var app = builder.Build();
 
 app.UseSerilogRequestLogging();

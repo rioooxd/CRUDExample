@@ -1,5 +1,8 @@
 ﻿using ClassLibrary;
+using CRUDExample.Filters;
 using CRUDExample.Filters.ActionFilters;
+using CRUDExample.Filters.AuthorizationFilters;
+using CRUDExample.Filters.ExceptionFilters;
 using CRUDExample.Filters.ResourceFilters;
 using CRUDExample.Filters.ResultFilters;
 using Microsoft.AspNetCore.Mvc;
@@ -13,6 +16,8 @@ namespace CRUDExample.Controllers
 {
     [Route("[controller]")]
     [TypeFilter(typeof(ResponseHeaderActionFilter), Arguments = new object[] {"MyKeyFromController", "MyValueFromController", 3}, Order = 3)]
+    [TypeFilter(typeof(HandleExceptionFilter))]
+    [TypeFilter(typeof(PersonsAlwaysRunResultFilter))]
     public class PersonsController : Controller
     {
         private readonly IPersonsService _personsService;
@@ -27,8 +32,9 @@ namespace CRUDExample.Controllers
         [Route("[action]")]
         [Route("/")]
         [TypeFilter(typeof(PersonsListActionFilter), Order = 4)]
-        [TypeFilter(typeof(ResponseHeaderActionFilter), Arguments = new object[] { "MyKeyFromIndexAction", "MyValueFromIndexAction", 1 }, Order = 1)]
-        [TypeFilter(typeof(PersonsListResultFilter))]
+        [ResponseHeaderActionFilter("my-key", "my-value", 1)]
+        [ServiceFilter(typeof(PersonsListResultFilter))]
+        [SkipFilter]
         public async Task<IActionResult> Index(string searchBy, string? searchString, string sortBy = nameof(PersonResponse.PersonName), SortOrderOptions sortOrder = SortOrderOptions.ASC)
         {
             _logger.LogInformation("Index action method of PersonsController");
@@ -43,7 +49,7 @@ namespace CRUDExample.Controllers
         }
         [Route("[action]")]
         [HttpGet]
-        [TypeFilter(typeof(ResponseHeaderActionFilter), Arguments = new object[] {"my-key", "my-value", 4})]
+        [ResponseHeaderActionFilter("my-key", "my-value", 4)]
         public async Task<IActionResult> Create()
         {
             List<CountryResponse> countries = await _countriesService.GetAllCountries();
@@ -65,6 +71,9 @@ namespace CRUDExample.Controllers
 
         [HttpGet]
         [Route("[action]/{personID}")]
+        //[TypeFilter(typeof(TokenResultFilter))]
+        [TypeFilter(typeof(PersonsAlwaysRunResultFilter))]
+            
         public async Task<IActionResult> Edit(Guid personID)
         {
             PersonResponse? personResponse = await _personsService.GetPersonByPersonID(personID);
@@ -85,6 +94,7 @@ namespace CRUDExample.Controllers
         [HttpPost]
         [Route("[action]/{personID}")]
         [TypeFilter(typeof(PersonCreateAndEditPostActionFilter))]
+        [TypeFilter(typeof(TokenAuthorziationFilter))]
         public async Task<IActionResult> Edit(PersonUpdateRequest personRequest, Guid personID)
         {
             PersonResponse? personResponse = await _personsService.GetPersonByPersonID(personID);
