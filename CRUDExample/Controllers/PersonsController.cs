@@ -15,7 +15,8 @@ using ServiceContracts.DTO.Enums;
 namespace CRUDExample.Controllers
 {
     [Route("[controller]")]
-    [TypeFilter(typeof(ResponseHeaderActionFilter), Arguments = new object[] {"MyKeyFromController", "MyValueFromController", 3}, Order = 3)]
+    //[TypeFilter(typeof(ResponseHeaderActionFilter), Arguments = new object[] {"MyKeyFromController", "MyValueFromController", 3}, Order = 3)]
+    [ResponseHeaderFilterFactory("MyKeyFromController", "MyValueFromController", 3)]
     [TypeFilter(typeof(HandleExceptionFilter))]
     [TypeFilter(typeof(PersonsAlwaysRunResultFilter))]
     public class PersonsController : Controller
@@ -32,7 +33,7 @@ namespace CRUDExample.Controllers
         [Route("[action]")]
         [Route("/")]
         [TypeFilter(typeof(PersonsListActionFilter), Order = 4)]
-        [ResponseHeaderActionFilter("my-key", "my-value", 1)]
+        [ResponseHeaderFilterFactory("my-key", "my-value", 1)]
         [ServiceFilter(typeof(PersonsListResultFilter))]
         [SkipFilter]
         public async Task<IActionResult> Index(string searchBy, string? searchString, string sortBy = nameof(PersonResponse.PersonName), SortOrderOptions sortOrder = SortOrderOptions.ASC)
@@ -49,7 +50,7 @@ namespace CRUDExample.Controllers
         }
         [Route("[action]")]
         [HttpGet]
-        [ResponseHeaderActionFilter("my-key", "my-value", 4)]
+        [ResponseHeaderFilterFactory("my-key", "my-value", 4)]
         public async Task<IActionResult> Create()
         {
             List<CountryResponse> countries = await _countriesService.GetAllCountries();

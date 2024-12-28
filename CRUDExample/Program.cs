@@ -11,9 +11,11 @@ using CRUDExample.Filters.ResultFilters;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddTransient<ResponseHeaderActionFilter>();
 builder.Services.AddControllersWithViews(options => {
     //options.Filters.Add<ResponseHeaderActionFilter>();
-    options.Filters.Add(new ResponseHeaderActionFilter("MyKeyGlobal", "MyValueGlobal", 2));
+    var logger = builder.Services.BuildServiceProvider().GetRequiredService<ILogger<ResponseHeaderActionFilter>>();
+    options.Filters.Add(new ResponseHeaderActionFilter(logger) { Key = "MyKeyGlobal", Value = "MyValueGlobal", Order = 2 });
 });
 
 builder.Host.UseSerilog((HostBuilderContext context, IServiceProvider services, LoggerConfiguration loggerConfiguration) => {
