@@ -17,7 +17,7 @@ namespace CRUDExample.Controllers
     [Route("[controller]")]
     //[TypeFilter(typeof(ResponseHeaderActionFilter), Arguments = new object[] {"MyKeyFromController", "MyValueFromController", 3}, Order = 3)]
     [ResponseHeaderFilterFactory("MyKeyFromController", "MyValueFromController", 3)]
-    [TypeFilter(typeof(HandleExceptionFilter))]
+    //[TypeFilter(typeof(HandleExceptionFilter))]
     [TypeFilter(typeof(PersonsAlwaysRunResultFilter))]
     public class PersonsController : Controller
     {
@@ -63,7 +63,6 @@ namespace CRUDExample.Controllers
         [HttpPost]
         [Route("[action]")]
         [TypeFilter(typeof(PersonCreateAndEditPostActionFilter))]
-        [TypeFilter(typeof(FeatureDisabledResourceFilter))]
         public async Task<IActionResult> Create(PersonAddRequest personRequest)
         {
             PersonResponse personResponse = await _personsService.AddPerson(personRequest);
@@ -95,7 +94,6 @@ namespace CRUDExample.Controllers
         [HttpPost]
         [Route("[action]/{personID}")]
         [TypeFilter(typeof(PersonCreateAndEditPostActionFilter))]
-        [TypeFilter(typeof(TokenAuthorziationFilter))]
         public async Task<IActionResult> Edit(PersonUpdateRequest personRequest, Guid personID)
         {
             PersonResponse? personResponse = await _personsService.GetPersonByPersonID(personID);

@@ -19,6 +19,7 @@ using RepositoryContracts;
 using Microsoft.Extensions.Logging;
 using Serilog;
 using SerilogTimings;
+using Exceptions;
 namespace Services
 {
     public class PersonsService : IPersonsService
@@ -137,7 +138,7 @@ namespace Services
             ValidationHelper.ModelValidation(personUpdateRequest);
 
             Person? matchingPerson = await _personsRepository.GetPersonByPersonID(personUpdateRequest.PersonID);
-            if (matchingPerson == null) throw new ArgumentNullException("Given PersonID doesnt exist");
+            if (matchingPerson == null) throw new InvalidPersonIDException("Given PersonID doesnt exist");
 
             matchingPerson.PersonName = personUpdateRequest.PersonName;
             matchingPerson.Email = personUpdateRequest.Email;
